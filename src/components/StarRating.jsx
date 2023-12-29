@@ -11,12 +11,12 @@ const starContainerStyle = {
   display: "flex",
 };
 
-const textStyle = {
-  lineHeight: "1",
-  margin: "0",
-};
-
-export const StarRating = ({ maxRating = 3 }) => {
+export const StarRating = ({
+  maxRating = 3,
+  messages = [],
+  color = "yellow",
+  size = 48,
+}) => {
   const [rating, setRating] = useState(0);
   const [tempRating, setTempRating] = useState(0);
 
@@ -32,12 +32,19 @@ export const StarRating = ({ maxRating = 3 }) => {
     setTempRating(0);
   };
 
+  const textStyle = {
+    lineHeight: "1",
+    margin: "0",
+    color,
+    fontSize: `${size / 1.5}px`,
+  };
+
   return (
     <div style={containerStyle}>
       <div style={starContainerStyle}>
         {Array.from({ length: maxRating }, (_, index) => {
           return (
-            <span style={textStyle}>
+            <span>
               <Star
                 key={index}
                 isFull={
@@ -46,12 +53,18 @@ export const StarRating = ({ maxRating = 3 }) => {
                 onRate={() => handleRating(index + 1)}
                 onMouseIn={() => handleMouseIn(index + 1)}
                 onMouseOut={() => handleMouseOut(0)}
+                color={color}
+                size={size}
               />
             </span>
           );
         })}
       </div>
-      <p>{tempRating || rating || ""}</p>
+      <p style={textStyle}>
+        {messages.length === maxRating
+          ? messages[tempRating ? tempRating - 1 : rating - 1]
+          : tempRating || rating || ""}
+      </p>
     </div>
   );
 };
