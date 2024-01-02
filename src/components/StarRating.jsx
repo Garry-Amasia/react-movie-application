@@ -16,12 +16,19 @@ export const StarRating = ({
   messages = [],
   color = "yellow",
   size = 48,
+  defaultRating = 0,
+  display,
 }) => {
-  const [rating, setRating] = useState(0);
+  const [rating, setRating] = useState(defaultRating);
   const [tempRating, setTempRating] = useState(0);
 
   const handleRating = (rating) => {
     setRating(rating);
+    if (display) {
+      display(rating);
+    } else {
+      return;
+    }
   };
 
   const handleMouseIn = (rating) => {
@@ -44,19 +51,17 @@ export const StarRating = ({
       <div style={starContainerStyle}>
         {Array.from({ length: maxRating }, (_, index) => {
           return (
-            <span>
-              <Star
-                key={index}
-                isFull={
-                  tempRating ? tempRating >= index + 1 : rating >= index + 1
-                }
-                onRate={() => handleRating(index + 1)}
-                onMouseIn={() => handleMouseIn(index + 1)}
-                onMouseOut={() => handleMouseOut(0)}
-                color={color}
-                size={size}
-              />
-            </span>
+            <Star
+              key={index}
+              isFull={
+                tempRating ? tempRating >= index + 1 : rating >= index + 1
+              }
+              onRate={() => handleRating(index + 1)}
+              onMouseIn={() => handleMouseIn(index + 1)}
+              onMouseOut={() => handleMouseOut(0)}
+              color={color}
+              size={size}
+            />
           );
         })}
       </div>
