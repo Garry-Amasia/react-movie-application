@@ -7,6 +7,7 @@ export const MovieDetails = ({
   onCloseMovie,
   APIKEY,
   onAddWatched,
+  watched,
 }) => {
   const [movie, setMovie] = useState({});
   const [isLoading, setIsLoading] = useState(false);
@@ -25,6 +26,30 @@ export const MovieDetails = ({
     Plot: plot,
     imdbID,
   } = movie;
+
+  useEffect(() => {
+    const getMovieDetails = async () => {
+      setIsLoading(true);
+      const res = await fetch(
+        `http://www.omdbapi.com/?apikey=${APIKEY}&i=${movieObj.imdbID}`
+      );
+      const data = await res.json();
+      setMovie(data);
+      setIsLoading(false);
+    };
+    getMovieDetails();
+  }, [movieObj.imdbID]);
+
+  useEffect(() => {
+    if (!title) return;
+    document.title = `${title}`;
+
+    return () => {
+      document.title = `Movie App`;
+      console.log("clean up function runs");
+      console.log(`clean up for movie ${title}`);
+    };
+  }, [title]);
 
   // console.log(title, year);
   // console.log(movieObj);
@@ -45,18 +70,16 @@ export const MovieDetails = ({
     onCloseMovie();
   };
 
-  useEffect(() => {
-    const getMovieDetails = async () => {
-      setIsLoading(true);
-      const res = await fetch(
-        `http://www.omdbapi.com/?apikey=${APIKEY}&i=${movieObj.imdbID}`
-      );
-      const data = await res.json();
-      setMovie(data);
-      setIsLoading(false);
-    };
-    getMovieDetails();
-  }, [movieObj.imdbID]);
+  // console.log("movie details component runs");
+
+  const setOfIDs = watched.map((singleMov) => singleMov.imdbID);
+  const isIncluded = setOfIDs.includes(movieObj.imdbID);
+
+  const ratingGivenByUser = watched.find(
+    (item) => item.imdbID === movieObj.imdbID
+  )?.userRating;
+  // console.log(isIncluded);
+  // console.log(watched);
 
   return (
     <>
@@ -82,10 +105,22 @@ export const MovieDetails = ({
           </header>
           <section>
             <div className="rating">
-              <StarRating size={24} maxRating={10} display={setUserRating} />
-              <button className="btn-add" onClick={handleAdd}>
-                add
-              </button>
+              {!isIncluded ? (
+                <>
+                  <StarRating
+                    size={24}
+                    maxRating={10}
+                    display={setUserRating}
+                  />
+                  {userRating > 0 && (
+                    <button className="btn-add" onClick={handleAdd}>
+                      add
+                    </button>
+                  )}
+                </>
+              ) : (
+                <p>You have rated this movie {ratingGivenByUser}</p>
+              )}
             </div>
             <p>
               <em>{plot}</em>

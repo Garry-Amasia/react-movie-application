@@ -19,7 +19,7 @@ export default function App() {
   const [watched, setWatched] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
-  const [query, setQuery] = useState("inception");
+  const [query, setQuery] = useState("");
 
   const [selectedMovieObj, setSelectedMovieObj] = useState(null);
 
@@ -32,13 +32,17 @@ export default function App() {
   const handleAddWatched = (movieObj) => {
     setWatched((current) => [...current, movieObj]);
   };
-  console.log(watched);
+
+  // console.log(watched);
 
   const handleCloseMovie = () => {
     setSelectedMovieObj(null);
   };
 
+  // console.log("app.js");
+
   useEffect(() => {
+    const controller = new AbortController();
     const fetchData = async () => {
       if (query.length < 3) {
         setMovies([]);
@@ -50,11 +54,13 @@ export default function App() {
         setIsLoading(true);
         // setError(""); //=> because query state is empty string and will return incorrect IMDb ID
         const response = await fetch(
-          `http://www.omdbapi.com/?apikey=${APIKEY}&s=${query}`
+          `http://www.omdbapi.com/?apikey=${APIKEY}&s=${query}`,
+          { signal: controller.signal }
         );
         // if (!response.ok) {
         //   throw new Error("Something wrong with your internet connection");
         // }
+
         const data = await response.json();
         if (data.Response === "False") {
           setError(data.Error);
@@ -62,13 +68,19 @@ export default function App() {
         }
         setMovies(data.Search);
       } catch (error) {
-        setError(error.message);
+        if (error.name !== "AbortError") {
+          setError(error.message);
+        }
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchData();
+
+    return () => {
+      controller.abort();
+    };
   }, [query]);
 
   return (
@@ -93,6 +105,7 @@ export default function App() {
               onCloseMovie={handleCloseMovie}
               APIKEY={APIKEY}
               onAddWatched={handleAddWatched}
+              watched={watched}
             />
           ) : (
             <>
