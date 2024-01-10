@@ -13,6 +13,8 @@ export const MovieDetails = ({
   const [isLoading, setIsLoading] = useState(false);
   const [userRating, setUserRating] = useState("");
 
+  //why we wont use let variable?because let will be reset to 0 on every render, useRef wont.
+  // let countRef = 0 ===> this is wrong(not persisted across render)
   const countRef = useRef(0);
 
   useEffect(() => {
@@ -63,7 +65,7 @@ export const MovieDetails = ({
       setIsLoading(false);
     };
     getMovieDetails();
-  }, [movieObj.imdbID]);
+  }, [movieObj.imdbID, APIKEY]);
 
   useEffect(() => {
     if (!title) return;

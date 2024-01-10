@@ -5,7 +5,10 @@ export const Box = ({ children }) => {
 
   return (
     <div className="box">
-      <button className="btn-toggle" onClick={() => setIsOpen((open) => !open)}>
+      <button
+        className="btn-toggle"
+        onClick={() => setIsOpen((current) => !current)}
+      >
         {isOpen ? "–" : "+"}
       </button>
       {isOpen && children}

@@ -8,9 +8,10 @@ export const Search = ({ query, setQuery }) => {
   //   el.focus();
   // }, []);
 
+  //when press enter app will focus on input
   const inputEl = useRef(null);
 
-  //we use useEffect because input need to be loaded to the DOM first
+  //we use useEffect because input need to be loaded to the DOM first(after mount )
   useEffect(() => {
     const callback = (e) => {
       if (document.activeElement === inputEl.current) return;

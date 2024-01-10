@@ -11,20 +11,22 @@ import { WatchedMovieList } from "./components/WatchedMovieList";
 import { Loader } from "./components/Loader";
 import { Error } from "./components/Error";
 import { MovieDetails } from "./components/MovieDetails";
+import { useMovies } from "./useMovies";
 
 const APIKEY = "2016dc0e";
 
 export default function App() {
-  const [movies, setMovies] = useState([]);
+  // const [movies, setMovies] = useState([]);
   const [watched, setWatched] = useState(() => {
     const dataStored = localStorage.getItem("watched");
     return JSON.parse(dataStored);
   });
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
+  // const [isLoading, setIsLoading] = useState(false);
+  // const [error, setError] = useState("");
   const [query, setQuery] = useState("");
-
   const [selectedMovieObj, setSelectedMovieObj] = useState(null);
+
+  const { movies, error, isLoading } = useMovies(query, handleCloseMovie);
 
   const handleSelectMovie = (movieObj) => {
     setSelectedMovieObj((current) =>
@@ -44,57 +46,61 @@ export default function App() {
     setWatched(filtered);
   };
 
-  const handleCloseMovie = () => {
+  // const handleCloseMovie = () => {
+  //   setSelectedMovieObj(null);
+  // };
+
+  function handleCloseMovie() {
     setSelectedMovieObj(null);
-  };
+  }
 
   useEffect(() => {
     localStorage.setItem("watched", JSON.stringify(watched));
   }, [watched]);
 
-  useEffect(() => {
-    const controller = new AbortController();
-    const fetchData = async () => {
-      if (query.length < 3) {
-        setMovies([]);
-        setError("");
-        return;
-      }
+  // useEffect(() => {
+  //   const controller = new AbortController();
+  //   const fetchData = async () => {
+  //     if (query.length < 3) {
+  //       setMovies([]);
+  //       setError("");
+  //       return;
+  //     }
 
-      try {
-        setIsLoading(true);
-        // setError(""); //=> because query state is empty string and will return incorrect IMDb ID
-        const response = await fetch(
-          `http://www.omdbapi.com/?apikey=${APIKEY}&s=${query}`,
-          { signal: controller.signal }
-        );
-        // if (!response.ok) {
-        //   throw new Error("Something wrong with your internet connection");
-        // }
+  //     try {
+  //       setIsLoading(true);
+  //       // setError(""); //=> because query state is empty string and will return incorrect IMDb ID
+  //       const response = await fetch(
+  //         `http://www.omdbapi.com/?apikey=${APIKEY}&s=${query}`,
+  //         { signal: controller.signal }
+  //       );
+  //       // if (!response.ok) {
+  //       //   throw new Error("Something wrong with your internet connection");
+  //       // }
 
-        const data = await response.json();
-        if (data.Response === "False") {
-          setError(data.Error);
-          return;
-        }
-        setMovies(data.Search);
-      } catch (error) {
-        if (error.name !== "AbortError") {
-          setError(error.message);
-        }
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  //       const data = await response.json();
+  //       if (data.Response === "False") {
+  //         setError(data.Error);
+  //         return;
+  //       }
+  //       setMovies(data.Search);
+  //     } catch (error) {
+  //       if (error.name !== "AbortError") {
+  //         setError(error.message);
+  //       }
+  //     } finally {
+  //       setIsLoading(false);
+  //     }
+  //   };
 
-    handleCloseMovie();
+  //   handleCloseMovie();
 
-    fetchData();
+  //   fetchData();
 
-    return () => {
-      controller.abort();
-    };
-  }, [query]);
+  //   return () => {
+  //     controller.abort();
+  //   };
+  // }, [query]);
 
   return (
     <>
