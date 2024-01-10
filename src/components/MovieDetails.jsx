@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { StarRating } from "./StarRating.jsx";
 import { Loader } from "./Loader";
 
@@ -13,6 +13,14 @@ export const MovieDetails = ({
   const [isLoading, setIsLoading] = useState(false);
   const [userRating, setUserRating] = useState("");
 
+  const countRef = useRef(0);
+
+  useEffect(() => {
+    if (userRating) {
+      countRef.current++;
+    }
+  }, [userRating]);
+
   const {
     Actors: actors,
     Director: director,
@@ -26,6 +34,23 @@ export const MovieDetails = ({
     Plot: plot,
     imdbID,
   } = movie;
+
+  // console.log(actors);
+
+  useEffect(() => {
+    const callback = (e) => {
+      if (e.code === "Escape") {
+        onCloseMovie();
+        console.log("closing");
+      }
+    };
+
+    document.addEventListener("keydown", callback);
+
+    return () => {
+      document.removeEventListener("keydown", callback);
+    };
+  }, [onCloseMovie]);
 
   useEffect(() => {
     const getMovieDetails = async () => {
@@ -64,6 +89,7 @@ export const MovieDetails = ({
       imdbRating: Number(imdbRating),
       runtime: Number(runtime.split(" ").at(0)),
       userRating,
+      userDecisionRating: countRef.current,
     };
 
     onAddWatched(newWatchedMovie);

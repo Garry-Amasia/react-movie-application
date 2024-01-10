@@ -16,7 +16,10 @@ const APIKEY = "2016dc0e";
 
 export default function App() {
   const [movies, setMovies] = useState([]);
-  const [watched, setWatched] = useState([]);
+  const [watched, setWatched] = useState(() => {
+    const dataStored = localStorage.getItem("watched");
+    return JSON.parse(dataStored);
+  });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [query, setQuery] = useState("");
@@ -31,15 +34,23 @@ export default function App() {
 
   const handleAddWatched = (movieObj) => {
     setWatched((current) => [...current, movieObj]);
+
+    //not really a good way to set local storage
+    // localStorage.setItem("watched", JSON.stringify([...watched, movieObj]));
   };
 
-  // console.log(watched);
+  const handleOnDelete = (mov) => {
+    const filtered = watched.filter((item) => item.imdbID !== mov.imdbID);
+    setWatched(filtered);
+  };
 
   const handleCloseMovie = () => {
     setSelectedMovieObj(null);
   };
 
-  // console.log("app.js");
+  useEffect(() => {
+    localStorage.setItem("watched", JSON.stringify(watched));
+  }, [watched]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -76,6 +87,8 @@ export default function App() {
       }
     };
 
+    handleCloseMovie();
+
     fetchData();
 
     return () => {
@@ -110,7 +123,7 @@ export default function App() {
           ) : (
             <>
               <WatchedSummary watched={watched} />
-              <WatchedMovieList watched={watched} />
+              <WatchedMovieList watched={watched} onDelete={handleOnDelete} />
             </>
           )}
         </Box>

@@ -1,6 +1,6 @@
 import React from "react";
 
-export const WatchedMovie = ({ movie }) => {
+export const WatchedMovie = ({ movie, onDelete }) => {
   return (
     <li key={movie.imdbID}>
       <img src={movie.poster} alt={`${movie.title} poster`} />
@@ -19,6 +19,9 @@ export const WatchedMovie = ({ movie }) => {
           <span>{movie.runtime} min</span>
         </p>
       </div>
+      <button className="btn-delete" onClick={() => onDelete(movie)}>
+        X
+      </button>
     </li>
   );
 };
